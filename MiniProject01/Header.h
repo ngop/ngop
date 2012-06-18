@@ -212,7 +212,7 @@ int set_gpio_value(int gpio, int value){
 	snprintf(path, sizeof path, "/sys/class/gpio/gpio%d/value", gpio);
 	
 	if((fp = fopen(path, "w")) == NULL){
-		printf("Cannot open specified value file.\n", gpio);
+		printf("Cannot open specified value file, %d\n", gpio);
 		return 1;
 	}
 

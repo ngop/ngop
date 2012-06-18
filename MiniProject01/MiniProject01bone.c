@@ -8,7 +8,7 @@
 #include <poll.h>
 #include <signal.h>
 
-int loop=0;
+int loop=1;
 
 
 void signal_handler(int sig)
@@ -51,7 +51,7 @@ int main(int argc, char** argv){
 	set_gpio_direction(gpio1, "in");
 	set_gpio_edge(gpio1, "falling");
 	gpio1_fd = gpio_fd_open(gpio1);
-
+	
 	//argument 2 will be output
 	export_gpio(gpio2);
 	set_gpio_direction(gpio2, "out");
@@ -81,22 +81,15 @@ int main(int argc, char** argv){
 		if((fdset[0].revents & POLLPRI) == POLLPRI) {
 			read(fdset[0].fd, buf, MAX_BUF);
 			printf("interrupt value=%c\n", buf[0]);
-			if(gpio2_value){
-			gpio2_value = 0;
-			}
-			else{
-			gpio_value = 1;
-			}
-			set_gpio_value(gpio2, gpio2_value);
-			printf("gpio2_value  = %d\n", gpio2_value);
+			pattern++;
+		if(pattern == 3){
+		pattern = 0;
+		}
 		}			
 		
-	}
+	
 
-	gpio_fd_close(gpio1_fd);
-	gpio_fd_close(gpio2_fd);
-	unexport_gpio(gpio1);
-	unexport_gpio(gpio2);
+
 
 	switch(pattern){
 	
@@ -105,7 +98,7 @@ int main(int argc, char** argv){
 		gpio2_value = 0;
 		}
 		else{
-		gpio_value = 1;
+		gpio2_value = 1;
 		}
 		set_gpio_value(gpio2, gpio2_value);
 	break;
@@ -117,11 +110,15 @@ int main(int argc, char** argv){
 		value = read_ain("ain6");
 		printf("Voltage: %d\n",value);
 	break;	
-		default;
+	default:
 		break;
 
 	}
-
+	}
+	gpio_fd_close(gpio1_fd);
+	gpio_fd_close(gpio2_fd);
+	unexport_gpio(gpio1);
+	unexport_gpio(gpio2);
 	fflush(stdout);
 	return 0;
 }
